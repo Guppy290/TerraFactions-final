@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TerraFactions - Jeu RP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .status-open {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+
+        .status-closed {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 70px 20px 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .login-box {
+            max-width: 400px;
+            margin: 0 auto;
+            padding-top: 100px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1em;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        select option {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #10b981, #059669);
+            color: white;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-danger {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9em;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .menu-btn {
+            padding: 24px;
+            border: 2px solid;
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .user-info {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 0.9em;
+            margin-top: 8px;
+        }
+
+        .message {
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .message-success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            color: #10b981;
+        }
+
+        .item-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+
+        .faction-autoria { color: #4A90E2; }
+        .faction-ignis { color: #E84545; }
+        .faction-omnis { color: #9B59B6; }
+
+        .log-item {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-left: 3px solid;
+        }
+
+        .log-attaque { border-left-color: #ef4444; }
+        .log-guerre { border-left-color: #f59e0b; }
+        .log-paix { border-left-color: #10b981; }
+        .log-achat { border-left-color: #06b6d4; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            font-size: 0.9em;
+        }
+
+        h1, h2, h3, h4 {
+            margin-bottom: 16px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .scrollable {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 70px 10px 20px;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Barre de statut -->
+    <div id="statusBar" class="status-bar status-open"></div>
+
+    <!-- Container principal -->
+    <div class="container" id="app"></div>
+
+    <script>
+        // ==================== CONFIGURATION ====================
+        const CONFIG = {
+            openHours: { start: 9, end: 18 },
+            dailyReward: 1000,
+            baseIncome: 250,
+            usineIncome: 500,
+            attackCooldown: 20,
+            researchCost: 10000,
+            researchIncrement: 10000,
+        };
+
+        const FACTIONS = {
+            Autoria: { color: '#4A90E2', emoji: '🛡️' },
+            Ignis: { color: '#E84545', emoji: '🔥' },
+            Omnis: { color: '#9B59B6', emoji: '⚙️' }
+        };
+
+        const PRICES = {
+            soldat: 1000,
+            tank: 5000,
+            avion: 7000,
+            navire: 10000,
+            labo: 10000,
+            bunker: 7500,
+            usine_base: 1000
+        };
+
+        // ==================== ÉTAT DU JEU ====================
+        let gameState = {
+            users: [],
+            wars: [],
+            attacks: [],
+            logs: [],
+            settings: { isOpen: true, lastReset: null },
+            currentUser: null,
+            currentView: 'login',
+            message: ''
+        };
+
+        // ==================== UTILITAIRES ====================
+        function calculatePower(user) {
+            return (user.soldats || 0) + (user.tanks || 0) * 3 + (user.avions || 0) * 5 + 
+                   (user.navires || 0) * 7 + (user.bunkers || 0) * 5;
+        }
+
+        function isGameOpen() {
+            if (!gameState.settings.isOpen) return false;
+            const now = new Date();
+            if (now.getDay() === 0) return false; // Dimanche
+            const hour = now.getHours();
+            return hour >= CONFIG.openHours.start && hour < CONFIG.openHours.end;
+        }
+
+        function canClaimDaily(lastDaily) {
+            if (!lastDaily) return true;
+            const now = new Date();
+            const last = new Date(lastDaily);
+            return now.toDateString() !== last.toDateString();
+        }
+
+        function showMessage(msg) {
+            gameState.message = msg;
+            render();
+            setTimeout(() => {
+                gameState.message = '';
+                render();
+            }, 3000);
+        }
+
+        function addLog(type, message, userId = null) {
+            gameState.logs.unshift({
+                id: Date.now() + Math.random(),
+                type,
+                message,
+                userId,
+                timestamp: new Date().toISOString()
+            });
+            gameState.logs = gameState.logs.slice(0, 100);
+            saveData();
+        }
+
+        // ==================== SAUVEGARDE ====================
+        function saveData() {
+            localStorage.setItem('terrafactions_users', JSON.stringify(gameState.users));
+            localStorage.setItem('terrafactions_wars', JSON.stringify(gameState.wars));
+            localStorage.setItem('terrafactions_attacks', JSON.stringify(gameState.attacks));
+            localStorage.setItem('terrafactions_logs', JSON.stringify(gameState.logs));
+            localStorage.setItem('terrafactions_settings', JSON.stringify(gameState.settings));
+        }
+
+        function loadData() {
+            try {
+                gameState.users = JSON.parse(localStorage.getItem('terrafactions_users') || '[]');
+                gameState.wars = JSON.parse(localStorage.getItem('terrafactions_wars') || '[]');
+                gameState.attacks = JSON.parse(localStorage.getItem('terrafactions_attacks') || '[]');
+                gameState.logs = JSON.parse(localStorage.getItem('terrafactions_logs') || '[]');
+                gameState.settings = JSON.parse(localStorage.getItem('terrafactions_settings') || '{"isOpen":true}');
+            } catch (e) {
+                console.error('Erreur chargement:', e);
+            }
+        }
+
+        // ==================== ACTIONS ====================
+        function login(username, password) {
+            const user = gameState.users.find(u => u.username === username && u.password === password);
+            if (user) {
+                const now = new Date();
+                const lastIncome = user.lastIncome ? new Date(user.lastIncome) : now;
+                const hours = Math.floor((now - lastIncome) / 3600000);
+                const income = hours * (CONFIG.baseIncome + (user.usines || 0) * CONFIG.usineIncome);
+                
+                user.terra_coins += income;
+                user.lastIncome = now.toISOString();
+                gameState.currentUser = user;
+                gameState.currentView = 'menu';
+                addLog('connexion', `${user.username} connecté`, user.id);
+                showMessage(income > 0 ? `Bienvenue ! +${income} TC` : 'Bienvenue !');
+                saveData();
+            } else {
+                showMessage('Identifiants incorrects');
+            }
+        }
+
+        function register(username, password, faction) {
+            if (!username || !password || !faction) {
+                showMessage('Tous les champs requis');
+                return;
+            }
+            if (gameState.users.find(u => u.username === username)) {
+                showMessage('Pseudo déjà pris');
+                return;
+            }
+            const newUser = {
+                id: Date.now(),
+                username,
+                password,
+                faction,
+                role: gameState.users.length === 0 ? 'fonda' : `soldat_${faction.toLowerCase()}`,
+                terra_coins: 10000,
+                soldats: 0, tanks: 0, avions: 0, navires: 0, labos: 0, usines: 0, bunkers: 0,
+                recherche: 0,
+                lastIncome: new Date().toISOString(),
+                lastDaily: null,
+                victories: 0,
+                defeats: 0
+            };
+            gameState.users.push(newUser);
+            gameState.currentUser = newUser;
+            gameState.currentView = 'menu';
+            addLog('inscription', `${newUser.username} rejoint ${faction}`, newUser.id);
+            showMessage('Compte créé !');
+            saveData();
+        }
+
+        function claimDaily() {
+            if (!canClaimDaily(gameState.currentUser.lastDaily)) {
+                showMessage('Déjà réclamé aujourd\'hui');
+                return;
+            }
+            gameState.currentUser.terra_coins += CONFIG.dailyReward;
+            gameState.currentUser.lastDaily = new Date().toISOString();
+            addLog('daily', `${gameState.currentUser.username} +${CONFIG.dailyReward} TC`, gameState.currentUser.id);
+            showMessage(`+${CONFIG.dailyReward} TC !`);
+            saveData();
+            render();
+        }
+
+        function buy(item) {
+            if (!isGameOpen()) {
+                showMessage('Jeu fermé !');
+                return;
+            }
+            let price = PRICES[item];
+            if (item === 'usine') price = (gameState.currentUser.usines + 1) * PRICES.usine_base;
+            
+            if (gameState.currentUser.terra_coins < price) {
+                showMessage('Pas assez de TC');
+                return;
+            }
+            
+            gameState.currentUser.terra_coins -= price;
+            if (item === 'usine') {
+                gameState.currentUser.usines++;
+            } else {
+                gameState.currentUser[item + 's']++;
+            }
+            addLog('achat', `${gameState.currentUser.username} achète ${item}`, gameState.currentUser.id);
+            showMessage(`${item} acheté !`);
+            saveData();
+            render();
+        }
+
+        function buyResearch() {
+            if (!isGameOpen()) {
+                showMessage('Jeu fermé !');
+                return;
+            }
+            const cost = CONFIG.researchCost + (gameState.currentUser.recherche * CONFIG.researchIncrement);
+            if (gameState.currentUser.terra_coins < cost) {
+                showMessage('Pas assez de TC');
+                return;
+            }
+            gameState.currentUser.terra_coins -= cost;
+            gameState.currentUser.recherche++;
+            addLog('recherche', `${gameState.currentUser.username} niveau ${gameState.currentUser.recherche}`, gameState.currentUser.id);
+            showMessage(`Recherche niveau ${gameState.currentUser.recherche} !`);
+            saveData();
+            render();
+        }
+
+        function attack(targetId) {
+            if (!isGameOpen()) {
+                showMessage('Jeu fermé !');
+                return;
+            }
+
+            const target = gameState.users.find(u => u.id === targetId);
+            if (!target) return;
+
+            if (target.faction === gameState.currentUser.faction) {
+                showMessage('Même faction !');
+                return;
+            }
+
+            const atWar = gameState.wars.some(w => 
+                w.status === 'war' && 
+                ((w.faction1 === gameState.currentUser.faction && w.faction2 === target.faction) ||
+                 (w.faction2 === gameState.currentUser.faction && w.faction1 === target.faction))
+            );
+
+            if (!atWar) {
+                showMessage('Pas de guerre !');
+                return;
+            }
+
+            const lastAttack = gameState.attacks.find(a => 
+                a.attackerId === gameState.currentUser.id && a.targetId === targetId
+            );
+            if (lastAttack && (Date.now() - new Date(lastAttack.timestamp)) / 60000 < CONFIG.attackCooldown) {
+                showMessage('Cooldown 20min !');
+                return;
+            }
+
+            const myPower = calculatePower(gameState.currentUser);
+            const targetPower = calculatePower(target);
+            if (myPower === 0) {
+                showMessage('Pas de troupes !');
+                return;
+            }
+            if (targetPower === 0) {
+                showMessage('Cible sans troupes !');
+                return;
+            }
+
+            const victory = Math.random() < myPower / (myPower + targetPower);
+            const myLoss = Math.max(1, Math.floor(gameState.currentUser.soldats * 0.4));
+            const targetLoss = Math.max(1, Math.floor(target.soldats * 0.4));
+
+            if (victory) {
+                const gain = Math.floor(target.terra_coins * 0.2);
+                gameState.currentUser.terra_coins += gain;
+                gameState.currentUser.soldats = Math.max(0, gameState.currentUser.soldats - myLoss);
+                gameState.currentUser.victories = (gameState.currentUser.victories || 0) + 1;
+                target.terra_coins = Math.max(0, target.terra_coins - gain);
+                target.soldats = Math.max(0, target.soldats - targetLoss);
+                target.defeats = (target.defeats || 0) + 1;
+                addLog('attaque', `${gameState.currentUser.username} bat ${target.username} (+${gain} TC)`, gameState.currentUser.id);
+                showMessage(`VICTOIRE ! +${gain} TC`);
+            } else {
+                const loss = Math.floor(gameState.currentUser.terra_coins * 0.1);
+                gameState.currentUser.terra_coins = Math.max(0, gameState.currentUser.terra_coins - loss);
+                gameState.currentUser.soldats = Math.max(0, gameState.currentUser.soldats - myLoss);
+                gameState.currentUser.defeats = (gameState.currentUser.defeats || 0) + 1;
+                target.terra_coins += loss;
+                target.soldats = Math.max(0, target.soldats - targetLoss);
+                target.victories = (target.victories || 0) + 1;
+                addLog('attaque', `${target.username} bat ${gameState.currentUser.username}`, gameState.currentUser.id);
+                showMessage(`DÉFAITE ! -${loss} TC`);
+            }
+
+            gameState.attacks.push({
+                id: Date.now(),
+                attackerId: gameState.currentUser.id,
+                targetId: targetId,
+                timestamp: new Date().toISOString(),
+                victory
+            });
+
+            saveData();
+            render();
+        }
+
+        function declareWar(f1, f2) {
+            if (gameState.currentUser.role !== 'fonda' && gameState.currentUser.role !== 'admin') {
+                showMessage('Admin uniquement');
+                return;
+            }
+            if (f1 === f2) {
+                showMessage('Même faction !');
+                return;
+            }
+            const existing = gameState.wars.find(w => 
+                (w.faction1 === f1 && w.faction2 === f2) || (w.faction1 === f2 && w.faction2 === f1)
+            );
+            if (existing?.status === 'war') {
+                showMessage('Déjà en guerre');
+                return;
+            }
+            
+            if (existing) {
+                existing.status = 'war';
+            } else {
+                gameState.wars.push({
+                    id: Date.now(),
+                    faction1: f1,
+                    faction2: f2,
+                    status: 'war',
+                    startTime: new Date().toISOString()
+                });
+            }
+            addLog('guerre', `Guerre ${f1} vs ${f2}`, gameState.currentUser.id);
+            showMessage('Guerre déclarée !');
+            saveData();
+            render();
+        }
+
+        function makePeace(f1, f2) {
+            if (gameState.currentUser.role !== 'fonda' && gameState.currentUser.role !== 'admin') {
+                showMessage('Admin uniquement');
+                return;
+            }
+            const war = gameState.wars.find(w => 
+                w.status === 'war' && 
+                ((w.faction1 === f1 && w.faction2 === f2) || (w.faction1 === f2 && w.faction2 === f1))
+            );
+            if (!war) {
+                showMessage('Pas de guerre');
+                return;
+            }
+            war.status = 'peace';
+            addLog('paix', `Paix ${f1} et ${f2}`, gameState.currentUser.id);
+            showMessage('Paix signée !');
+            saveData();
+            render();
+        }
+
+        function getFactionStats(faction) {
+            const factionUsers = gameState.users.filter(u => u.faction === faction);
+            return {
+                membres: factionUsers.length,
+                puissance: factionUsers.reduce((sum, u) => sum + calculatePower(u), 0),
+                richesse: factionUsers.reduce((sum, u) => sum + u.terra_coins, 0),
+                recherche: factionUsers.reduce((sum, u) => sum + (u.recherche || 0), 0)
+            };
+        }
+
+        function changeRole(userId, newRole) {
+            if (gameState.currentUser.role !== 'fonda' && gameState.currentUser.role !== 'admin') return;
+            const user = gameState.users.find(u => u.id === userId);
+            if (user?.role === 'fonda' && gameState.currentUser.role !== 'fonda') {
+                showMessage('Impossible');
+                return;
+            }
+            user.role = newRole;
+            addLog('admin', `${user.username} → ${newRole}`, gameState.currentUser.id);
+            showMessage('Rôle changé');
+            saveData();
+            render();
+        }
+
+        function resetAll() {
+            if (gameState.currentUser?.role !== 'fonda') return;
+            if (!confirm('TOUT réinitialiser ?')) return;
+            
+            gameState.users.forEach(u => {
+                u.terra_coins = 10000;
+                u.soldats = 0; u.tanks = 0; u.avions = 0; u.navires = 0;
+                u.labos = 0; u.usines = 0; u.bunkers = 0;
+                u.recherche = 0;
+                u.victories = 0; u.defeats = 0;
+            });
+            gameState.wars = [];
+            gameState.attacks = [];
+            gameState.logs = [];
+            gameState.settings.lastReset = new Date().toISOString();
+            addLog('system', 'Reset complet');
+            showMessage('Reset effectué !');
+            saveData();
+            render();
+        }
+
+        function toggleGame() {
+            if (gameState.currentUser?.role !== 'fonda') return;
+            gameState.settings.isOpen = !gameState.settings.isOpen;
+            addLog('system', `Jeu ${gameState.settings.isOpen ? 'ouvert' : 'fermé'}`, gameState.currentUser.id);
+            showMessage(`Jeu ${gameState.settings.isOpen ? 'ouvert' : 'fermé'}`);
+            saveData();
+            render();
+        }
+
+        function logout() {
+            gameState.currentUser = null;
+            gameState.currentView = 'login';
+            render();
+        }
+
+        // ==================== RENDU ====================
+        function render() {
+            const app = document.getElementById('app');
+            const statusBar = document.getElementById('statusBar');
+            const isOpen = isGameOpen();
+
+            // Barre de statut
+            statusBar.className = `status-bar ${isOpen ? 'status-open' : 'status-closed'}`;
+            statusBar.textContent = isOpen ? 
+                `⏰ Jeu OUVERT (${CONFIG.openHours.start}h-${CONFIG.openHours.end}h)` : 
+                '🔒 Jeu FERMÉ';
+
+            // Vue login/register
+            if (!gameState.currentUser) {
+                app.innerHTML = `
+                    <div class="login-box">
+                        <div class="login-card">
+                            <h1 style="text-align: center; margin-bottom: 10px;">🌍 TerraFactions</h1>
+                            <p style="text-align: center; opacity: 0.8; margin-bottom: 30px; font-size: 0.9em;">Jeu Web RP Multi-Factions</p>
+                            
+                            <div id="loginForm" ${gameState.currentView === 'register' ? 'class="hidden"' : ''}>
+                                <input type="text" id="loginUsername" placeholder="Pseudo" />
+                                <input type="password" id="loginPassword" placeholder="Mot de passe" />
+                                <button class="btn-primary" onclick="login(document.getElementById('loginUsername').value, document.getElementById('loginPassword').value)">Se connecter</button>
+                                <button class="btn-secondary" onclick="gameState.currentView='register'; render();">Créer un compte</button>
+                            </div>
+
+                            <div id="registerForm" ${gameState.currentView === 'login' ? 'class="hidden"' : ''}>
+                                <input type="text" id="regUsername" placeholder="Pseudo" />
+                                <input type="password" id="regPassword" placeholder="Mot de passe" />
+                                <select id="regFaction">
+                                    <option value="">Choisir faction</option>
+                                    <option value="Autoria">🛡️ Autoria - Défenseurs</option>
+                                    <option value="Ignis">🔥 Ignis - Guerriers</option>
+                                    <option value="Omnis">⚙️ Omnis - Technologues</option>
+                                </select>
+                                <button class="btn-primary" onclick="register(document.getElementById('regUsername').value, document.getElementById('regPassword').value, document.getElementById('regFaction').value)">S'inscrire</button>
+                                <button class="btn-secondary" onclick="gameState.currentView='login'; render();">Retour</button>
+                            </div>
+
+                            ${gameState.message ? `<div class="message message-success">${gameState.message}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Menu principal
+            if (gameState.currentView === 'menu') {
+                app.innerHTML = `
+                    <div class="card">
+                        <div class="header">
+                            <div>
+                                <h2>${gameState.currentUser.username}</h2>
+                                <div class="user-info">
+                                    <span class="faction-${gameState.currentUser.faction.toLowerCase()}">${FACTIONS[gameState.currentUser.faction].emoji} ${gameState.currentUser.faction}</span>
+                                    <span style="color: #10b981;">💰 ${gameState.currentUser.terra_coins.toLocaleString()} TC</span>
+                                    <span style="color: #a855f7;">⚡ ${calculatePower(gameState.currentUser)}</span>
+                                </div>
+                            </div>
+                            <button class="btn-danger btn-small" onclick="logout()">🚪 Déconnexion</button>
+                        </div>
+                    </div>
+
+                    ${gameState.message ? `<div class="message message-success">${gameState.message}</div>` : ''}
+
+                    <div class="grid">
+                        <button class="menu-btn" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3); color: white;" onclick="gameState.currentView='boutique'; render();" ${!isOpen ? 'disabled' : ''}>
+                            <span style="font-size: 2em;">🛒</span>
+                            <span>Boutique</span>
+                        </button>
+
+                        <button class="menu-btn" style="background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: white;" onclick="gameState.currentView='attaque'; render();" ${!isOpen ? 'disabled' : ''}>
+                            <span style="font-size: 2em;">⚔️</span>
+                            <span>Attaque</span>
+                        </button>
+
+                        <button class="menu-btn" style="background: rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.3); color: white;" onclick="gameState.currentView='politique'; render();">
+                            <span style="font-size: 2em;">🏛️</span>
+                            <span>Politique</span>
+                        </button>
+
+                        <button class="menu-btn" style="background: rgba(234,179,8,0.1); border-color: rgba(234,179,8,0.3); color: white;" onclick="claimDaily()" ${!canClaimDaily(gameState.currentUser.lastDaily) ? 'disabled' : ''}>
+                            <span style="font-size: 2em;">🏆</span>
+                            <span>Daily</span>
+                        </button>
+
+                        <button class="menu-btn" style="background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); color: white;" onclick="gameState.currentView='classement'; render();">
+                            <span style="font-size: 2em;">👥</span>
+                            <span>Classement</span>
+                        </button>
+
+                        <button class="menu-btn" style="background: rgba(236,72,153,0.1); border-color: rgba(236,72,153,0.3); color: white;" onclick="gameState.currentView='profil'; render();">
+                            <span style="font-size: 2em;">👤</span>
+                            <span>Profil</span>
+                        </button>
+
+                        <button class="menu-btn" style="background: rgba(148,163,184,0.1); border-color: rgba(148,163,184,0.3); color: white;" onclick="gameState.currentView='logs'; render();">
+                            <span style="font-size: 2em;">📜</span>
+                            <span>Historique</span>
+                        </button>
+
+                        ${gameState.currentUser.role === 'fonda' ? `
+                        <button class="menu-btn" style="background: rgba(220,38,38,0.1); border-color: rgba(220,38,38,0.3); color: white;" onclick="gameState.currentView='admin'; render();">
+                            <span style="font-size: 2em;">⚙️</span>
+                            <span>Admin</span>
+                        </button>
+                        ` : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            // Vue Boutique
+            if (gameState.currentView === 'boutique') {
+                const items = [
+                    { id: 'soldat', name: '🎖️ Soldat', price: PRICES.soldat },
+                    { id: 'tank', name: '🚜 Tank', price: PRICES.tank },
+                    { id: 'avion', name: '✈️ Avion', price: PRICES.avion },
+                    { id: 'navire', name: '🚢 Navire', price: PRICES.navire },
+                    { id: 'labo', name: '🔬 Laboratoire', price: PRICES.labo },
+                    { id: 'bunker', name: '🏰 Bunker', price: PRICES.bunker },
+                    { id: 'usine', name: '🏭 Usine', price: (gameState.currentUser.usines + 1) * PRICES.usine_base }
+                ];
+
+                app.innerHTML = `
+                    <div class="card">
+                        <div class="header">
+                            <h3>🛒 Boutique Militaire</h3>
+                            <button class="btn-secondary btn-small" onclick="gameState.currentView='menu'; render();">Retour</button>
+                        </div>
+                    </div>
+
+                    ${gameState.message ? `<div class="message message-success">${gameState.message}</div>` : ''}
+
+                    <div class="card">
+                        <div class="item-list">
+                            ${items.map(item => `
+                                <div class="item-row">
+                                    <div>
+                                        <div style="font-weight: 600;">${item.name}</div>
+                                        <div style="color: #94a3b8; font-size: 0.85em;">${item.price.toLocaleString()} TC</div>
+                                    </div>
+                                    <button class="btn-primary" onclick="buy('${item.id}')" ${gameState.currentUser.terra_coins < item.price ? 'disabled' : ''}>Acheter</button>
+                                </div>
+                            `).join('')}
+
+                            <div class="item-row" style="background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3);">
+                                <div>
+                                    <div style="font-weight: 600;">🔬 Recherche Technologique</div>
+                                    <div style="color: #94a3b8; font-size: 0.85em;">Niveau ${gameState.currentUser.recherche} • ${(CONFIG.researchCost + gameState.currentUser.recherche * CONFIG.researchIncrement).toLocaleString()} TC</div>
+                                </div>
+                                <button class="btn-primary" style="background: linear-gradient(90deg, #a855f7, #9333ea);" onclick="buyResearch()" ${gameState.currentUser.terra_coins < (CONFIG.researchCost + gameState.currentUser.recherche * CONFIG.researchIncrement) ? 'disabled' : ''}>Améliorer</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Vue Attaque
+            if (gameState.currentView === 'attaque') {
+                const targets = gameState.users.filter(u => 
+                    u.id !== gameState.currentUser.id && 
+                    u.faction !== gameState.currentUser.faction && 
+                    calculatePower(u) > 0 &&
+                    gameState.wars.some(w => 
+                        w.status === 'war' && 
+                        ((w.faction1 === gameState.currentUser.faction && w.faction2 === u.faction) ||
+                         (w.faction2 === gameState.currentUser.faction && w.faction1 === u.faction))
+                    )
+                );
+
+                app.innerHTML = `
+                    <div class="card">
+                        <div class="header">
+                            <h3>⚔️ Attaque</h3>
+                            <button class="btn-secondary btn-small" onclick="gameState.currentView='menu'; render();">Retour</button>
+                        </div>
+                    </div>
+
+                    ${gameState.message ? `<div class="message message-success">${gameState.message}</div>` : ''}
+
+                    <div class="card">
+                        ${targets.length > 0 ? `
+                            <div class="item-list">
+                                ${targets.map(target => `
+                                    <div class="item-row">
+                                        <div>
+                                            <div style="font-weight: 600;">${target.username}</div>
+                                            <div style="font-size: 0.85em;">
+                                                <span class="faction-${target.faction.toLowerCase()}">${FACTIONS[target.faction].emoji} ${target.faction}</span>
+                                                <span style="color: #a855f7; margin-left: 12px;">⚡ ${calculatePower(target)}</span>
+                                            </div>
+                                        </div>
+                                        <button class="btn-danger" onclick="attack(${target.id})">Attaquer</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            <div style="text-align: center; padding: 40px; color: #94a3b8;">
+                                Aucune cible disponible. Déclarez la guerre dans le menu Politique !
+                            </div>
+                        `}
+                    </div>
+                `;
+                return;
+            }
+
+            // Vue Politique
+            if (gameState.currentView === 'politique') {
+                app.innerHTML = `
+                    <div class="card">
+                        <div class="header">
+                            <h3>🏛️ Politique & Guerres</h3>
+                            <button class="btn-secondary btn-small" onclick="gameState.currentView='menu'; render();">Retour</button>
+                        </div>
+                    </div>
+
+                    ${gameState.message ? `<div class="message message-success">${gameState.message}</div>` : ''}
+
+                    <div class="card">
+                        <h4>📊 État des Factions</h4>
+                        <div class="item-list">
+                            ${Object.keys(FACTIONS).map(faction => {
+                                const stats = getFactionStats(faction);
+                                return `
+                                    <div class="item-row" style="background: ${FACTIONS[faction].color}11; border: 1px solid ${FACTIONS[faction].color}44;">
+                                        <div style="width: 100%;">
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                                <span class="faction-${faction.toLowerCase()}" style="font-weight: 600;">${FACTIONS[faction].emoji} ${faction}</span>
+                                                <span style="color: #94a3b8; font-size: 0.85em;">${stats.membres} membres</span>
+                                            </div>
+                                            <div class="stats-grid">
+                                                <div><span style="color: #94a3b8;">Puissance:</span> ${stats.puissance}</div>
+                                                <div><span style="color: #94a3b8;">Richesse:</span> ${stats.richesse.toLocaleString()}</div>
+                                                <div><span style="color: #94a3b8;">Recherche:</span> ${stats.recherche}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h4>⚔️ Guerres en cours</h4>
+                        ${gameState.wars.filter(w => w.status === 'war').length > 0 ? `
+                            <div class="item-list">
+                                ${gameState.wars.filter(w => w.status === 'war').map(war => `
+                                    <div class="item-row" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);">
+                                        <span>${war.faction1} ⚔️ ${war.faction2}</span>
+                                        ${(gameState.currentUser.role === 'fonda' || gameState.currentUser.role === 'admin') ? `
+                                            <button class="btn-primary btn-small" onclick="makePeace('${war.faction1}', '${war.faction2}')">Paix</button>
+                                        ` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            <div style="text-align: center; padding: 20px; color: #94a3b8;">Aucune guerre active</div>
+                        `}
+                    </div>
+
+                    ${(gameState.currentUser.role === 'fonda' || gameState.currentUser.role === 'admin') ? `
+                    <div class="card" style="background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3);">
+                        <h4>🕊️ Actions Diplomatiques</h4>
+                        <div style="display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;">
+                            <select id="warF1" style="flex: 1; min-width: 120px; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.1);">
+                                <option value="">Faction 1</option>
+                                ${Object.keys(FACTIONS).map(f => `<option value="${f}">${f}</option>`).join('')}
+                            </select>
+                            <select id="warF2" style="flex: 1; min-width: 120px; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.1);">
+                                <option value="">Faction 2</option>
+                                ${Object.keys(FACTIONS).map(f => `<option value="${f}">${f}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn-danger" style="flex: 1;" onclick="declareWar(document.getElementById('warF1').value, document.getElementById('warF2').value)">Déclarer guerre</button>
+                            <button class="btn-primary" style="flex: 1;" onclick="makePeace(document.getElementById('warF1').value, document.getElementById('warF2').value)">Signer paix</button>
+                        </div>
+                    </div>
+                    ` : ''}
+                `;
+                return;
+            }
+
+            // Vue Classement
+            if (gameState.currentView === 'classement') {
+                const topRichesse = [...gameState.users].sort((a, b) => b.terra_coins - a.terra_coins).slice(0, 10);
+                const topPuissance = [...gameState.users].sort((a, b) => calculatePower(b) - calculatePower(a)).slice(0, 10);
+
+                app.innerHTML = `
+                    <div class="card">
+                        <div class="header">
+                            <h3>🏆 Classement</h3>
+                            <button class="btn-secondary btn-small" onclick="gameState.currentView='menu'; render();">Retour</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h4>💰 Top Richesse</h4>
+                        <div class="item-list">
+                            ${topRichesse.map((user, i) => `
+                                <div class="item-row" style="${user.id === gameState.currentUser.id ? 'background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);' : ''}">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <span style="color: ${i < 3 ? '#f59e0b' : 'white'}; font-weight: 600; width: 24px;">
+                                            ${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`}
+                                        </span>
+                                        <span>${user.username}</span>
+                                        <span class="faction-${user.faction.toLowerCase()}" style="font-size: 0.85em;">${FACTIONS[user.faction].emoji} ${user.faction}</span>
+                                    </div>
+                                    <span style="color: #10b981; font-weight: 600;">${user.terra_coins.toLocaleString()} TC</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h4>⚡ Top Puissance</h4>
+                        <div class="item-list">
+                            ${topPuissance.map((user, i) => `
+                                <div class="item-row" style="${user.id === gameState.currentUser.id ? 'background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3);' : ''}">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <span style="color: ${i < 3 ? '#f59e0b' : 'white'}; font-weight: 600; width: 24px;">
+                                            ${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`}
+                                        </span>
+                                        <span>${user.username}</span>
+                                        <span class="faction-${user.faction.toLowerCase()}" style="font-size: 0.85em;">${FACTIONS[user.faction].emoji} ${user.faction}</span>
+                                    </div>
+                                    <span style="color: #a855f7; font-weight: 600;">${calculatePower(user)} ⚡</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Vue Profil
+            if (gameState.currentView === 'profil') {
+                app.innerHTML = `
+                    <div class="card">
+                        <div class="header">
+                            <h3>👤 Mon Profil</h3>
+                            <button class="btn-secondary btn-small" onclick="gameState.currentView='menu'; render();">Retour</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h4>Informations</h4>
+                        <div class="stats-grid">
+                            <div><span style="color: #94a3b8;">Pseudo:</span> ${gameState.currentUser.username}</div>
+                            <div><span style="color: #94a3b8;">Faction:</span> <span class="faction-${gameState.currentUser.faction.toLowerCase()}">${FACTIONS[gameState.currentUser.faction].emoji} ${gameState.currentUser.faction}</span></div>
+                            <div><span style="color: #94a3b8;">Grade:</span> ${gameState.currentUser.role}</div>
+                            <div><span style="color: #94a3b8;">Richesse:</span> <span style="color: #10b981;">${gameState.currentUser.terra_coins.toLocaleString()} TC</span></div>
+                            <div><span style="color: #94a3b8;">Puissance:</span> <span style="color: #a855f7;">${calculatePower(gameState.currentUser)} ⚡</span></div>
+                            <div><span style="color: #94a3b8;">Recherche:</span> Niv. ${gameState.currentUser.recherche}</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h4>🎖️ Arsenal</h4>
+                        <div class="stats-grid">
+                            <div><span style="color: #94a3b8;">🎖️ Soldats:</span> ${gameState.currentUser.soldats}</div>
+                            <div><span style="color: #94a3b8;">🚜 Tanks:</span> ${gameState.currentUser.tanks}</div>
+                            <div><span style="color: #94a3b8;">✈️ Avions:</span> ${gameState.currentUser.avions}</div>
+                            <div><span style="color: #94a3b8;">🚢 Navires:</span> ${gameState.currentUser.navires}</div>
+                            <div><span style="color: #94a3b8;">🏰 Bunkers:</span> ${gameState.currentUser.bunkers}</div>
+                            <div><span style="color: #94a3b8;">🏭 Usines:</span> ${gameState.currentUser.usines}</div>
+                            <div><span style="color: #94a3b8;">🔬 Labos:</span> ${gameState.currentUser.labos}</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h4>⚔️ Statistiques de Combat</h4>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                            <div>
+                                <div style="color: #94a3b8; font-size: 0.85em;">Victoires</div>
+                                <div style="color: #10b981; font-weight: 600; font-size: 1.5em;">${gameState.currentUser.victories || 0}</div>
+                            </div>
+                            <div>
+                                <div style="color: #94a3b8; font-size: 0.85em;">Défaites</div>
+                                <div style="color: #ef4444; font-weight: 600; font-size: 1.5em;">${gameState.currentUser.defeats || 0}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Vue Logs
+            if (gameState.currentView === 'logs') {
+                app.innerHTML = `
+                    <div class="card">
+                        <div class="header">
+                            <h3>📜 Historique</h3>
+                            <button class="btn-secondary btn-small" onclick="gameState.currentView='menu'; render();">Retour</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="scrollable">
+                            ${gameState.logs.length > 0 ? 
+                                gameState.logs.slice(0, 50).map(log => `
+                                    <div class="log-item log-${log.type}">
+                                        <div style="font-size: 0.9em; margin-bottom: 4px;">${log.message}</div>
+                                        <div style="color: #64748b; font-size: 0.75em;">${new Date(log.timestamp).toLocaleString('fr-FR')}</div>
+                                    </div>
+                                `).join('') 
+                                : `<div style="text-align: center; padding: 40px; color: #94a3b8;">Aucun événement</div>`
+                            }
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Vue Admin
+            if (gameState.currentView === 'admin' && gameState.currentUser.role === 'fonda') {
+                app.innerHTML = `
+                    <div class="card">
+                        <div class="header">
+                            <h3>⚙️ Administration</h3>
+                            <button class="btn-secondary btn-small" onclick="gameState.currentView='menu'; render();">Retour</button>
+                        </div>
+                    </div>
+
+                    ${gameState.message ? `<div class="message message-success">${gameState.message}</div>` : ''}
+
+                    <div class="card" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);">
+                        <h4>🔧 Contrôles Système</h4>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button class="btn-${gameState.settings.isOpen ? 'danger' : 'primary'}" onclick="toggleGame()">
+                                ${gameState.settings.isOpen ? '🔒 Fermer le jeu' : '🔓 Ouvrir le jeu'}
+                            </button>
+                            <button class="btn-danger" onclick="resetAll()">🔄 RESET COMPLET</button>
+                        </div>
+                        ${gameState.settings.lastReset ? `
+                            <div style="margin-top: 12px; color: #94a3b8; font-size: 0.85em;">
+                                Dernier reset: ${new Date(gameState.settings.lastReset).toLocaleString('fr-FR')}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="card" style="background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3);">
+                        <h4>👥 Gestion des Rôles</h4>
+                        <div class="scrollable">
+                            ${gameState.users.map(user => `
+                                <div class="item-row">
+                                    <div>
+                                        <div style="font-weight: 600;">${user.username}</div>
+                                        <div style="font-size: 0.85em; margin-top: 4px;">
+                                            <span class="faction-${user.faction.toLowerCase()}">${FACTIONS[user.faction].emoji} ${user.faction}</span>
+                                            <span style="color: #94a3b8; margin-left: 8px;">${user.role}</span>
+                                        </div>
+                                    </div>
+                                    ${user.role !== 'fonda' ? `
+                                        <select onchange="changeRole(${user.id}, this.value)" style="padding: 6px 12px; border-radius: 6px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.1); font-size: 0.85em;">
+                                            <option value="soldat_${user.faction.toLowerCase()}" ${user.role === `soldat_${user.faction.toLowerCase()}` ? 'selected' : ''}>Soldat</option>
+                                            <option value="sergent_${user.faction.toLowerCase()}" ${user.role === `sergent_${user.faction.toLowerCase()}` ? 'selected' : ''}>Sergent</option>
+                                            <option value="lieutenant_${user.faction.toLowerCase()}" ${user.role === `lieutenant_${user.faction.toLowerCase()}` ? 'selected' : ''}>Lieutenant</option>
+                                            <option value="capitaine_${user.faction.toLowerCase()}" ${user.role === `capitaine_${user.faction.toLowerCase()}` ? 'selected' : ''}>Capitaine</option>
+                                            <option value="chef_${user.faction.toLowerCase()}" ${user.role === `chef_${user.faction.toLowerCase()}` ? 'selected' : ''}>Chef</option>
+                                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                                        </select>
+                                    ` : `<span style="color: #f59e0b; font-size: 0.85em;">👑 Fondateur</span>`}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+        }
+
+        // ==================== INITIALISATION ====================
+        loadData();
+        render();
+    </script>
+</body>
+</html>
